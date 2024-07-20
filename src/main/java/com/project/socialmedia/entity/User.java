@@ -3,7 +3,8 @@ package com.project.socialmedia.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "customer")
@@ -24,7 +25,7 @@ public class User {
     private String summary;
 
     @Column(name = "birthdate")
-    private Date birthDate;
+    private LocalDateTime birthDate;
 
     @Column(name = "username", unique = true)
     private String username;
@@ -34,4 +35,19 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
+    @OneToMany(mappedBy = "author")  // Corrigido
+    private Set<Post> posts;
+
+    @ManyToMany
+    @JoinTable(name = "user_follow",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id"))
+    private Set<User> followers;
+
+    @ManyToMany
+    @JoinTable(name = "user_following",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "following_id"))
+    private Set<User> following;
 }
