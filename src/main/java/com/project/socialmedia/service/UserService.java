@@ -5,8 +5,10 @@ import com.project.socialmedia.dto.UserResponseDTO;
 import com.project.socialmedia.dto.mapper.UserMapperService;
 import com.project.socialmedia.entity.User;
 import com.project.socialmedia.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +29,12 @@ public class UserService {
 
     public Optional<UserResponseDTO> findById(Long id){
         return userRepository.findById(id).map(userMapperService::toResponseDTO);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException(String.format("User not found"))
+        );
     }
 
     public List<UserResponseDTO> findAll(){
