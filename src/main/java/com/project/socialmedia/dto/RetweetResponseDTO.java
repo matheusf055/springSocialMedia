@@ -2,6 +2,8 @@ package com.project.socialmedia.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor @NoArgsConstructor @Data
 public class RetweetResponseDTO {
 
@@ -9,5 +11,5 @@ public class RetweetResponseDTO {
     private Long postId;
     private Long authorId;
     private Long retweeterId;
-    private String createdAt;
+    private LocalDateTime createdAt;
 }

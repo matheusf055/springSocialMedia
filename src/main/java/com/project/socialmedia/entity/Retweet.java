@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -25,7 +26,8 @@ public class Retweet {
     @Column(name = "retweeter_id")
     private Long retweeterId;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
+    @CreatedDate
     private LocalDateTime createdAt;
 
     @ManyToOne
@@ -39,4 +41,9 @@ public class Retweet {
     @ManyToOne
     @JoinColumn(name = "retweeter_id", insertable = false, updatable = false)
     private User retweeter;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }
