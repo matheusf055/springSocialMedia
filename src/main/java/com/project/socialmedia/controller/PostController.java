@@ -29,6 +29,12 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<Void> like(@PathVariable Long postId) {
+        postService.like(postId);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/{postId}/repost")
     public ResponseEntity<Void> repost(@PathVariable Long postId, @RequestBody RetweetRequestDTO retweetRequestDTO){
         postService.repost(retweetRequestDTO);
@@ -50,5 +56,11 @@ public class PostController {
     public ResponseEntity<PostResponseDTO> update(@PathVariable Long id, @RequestBody PostRequestDTO postRequestDTO){
         PostResponseDTO postResponseDTO = postService.update(id, postRequestDTO);
         return ResponseEntity.ok(postResponseDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        postService.delete(id);
+        return ResponseEntity.ok().build();
     }
 }

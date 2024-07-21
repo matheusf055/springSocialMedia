@@ -45,6 +45,10 @@ public class PostService {
         return null;
     }
 
+    public void delete(Long id) {
+        postRepository.deleteById(id);
+    }
+
     public void comment(Long postId, PostRequestDTO postRequestDTO) {
         Post post = postRepository.findById(postId).orElseThrow();
         Comment comment = new Comment();
@@ -52,6 +56,12 @@ public class PostService {
         comment.setPost(post);
         post.getComments().add(comment);
         post.setNumberComments(post.getNumberComments() + 1);
+        postRepository.save(post);
+    }
+
+    public void like(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+        post.setLikes(post.getLikes() + 1);
         postRepository.save(post);
     }
 
