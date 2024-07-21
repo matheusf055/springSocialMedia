@@ -6,4 +6,5 @@ import lombok.*;
 public class PostRequestDTO {
 
     private String text;
+    private Long userId;
 }

@@ -13,11 +13,13 @@ public class PostMapperService {
 
     private final ModelMapper modelMapper;
 
-    public Post toEntity(PostRequestDTO requestDTO){
-        return modelMapper.map(requestDTO, Post.class);
+    public Post toEntity(PostRequestDTO postRequestDTO) {
+        Post post = modelMapper.map(postRequestDTO, Post.class);
+        post.setUserId(postRequestDTO.getUserId());
+        return post;
     }
 
-    public PostResponseDTO toResponseDTO(Post post){
+    public PostResponseDTO toResponseDTO(Post post) {
         return modelMapper.map(post, PostResponseDTO.class);
     }
 }

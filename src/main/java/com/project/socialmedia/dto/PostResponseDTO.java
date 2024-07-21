@@ -10,8 +10,6 @@ public class PostResponseDTO {
 
     private Long id;
     private Long userId;
-    private Long authorId;
-    private String author;
     private String text;
     private int likes;
     private int reposts;

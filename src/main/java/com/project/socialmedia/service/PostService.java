@@ -61,8 +61,6 @@ public class PostService {
 
         Post repost = new Post();
         repost.setUserId(retweetRequestDTO.getAuthorId());
-        repost.setAuthorId(post.getAuthorId());
-        repost.setAuthor(post.getAuthor());
         repost.setText(post.getText());
         repost.setReposts(0);
         repost.setLikes(0);
