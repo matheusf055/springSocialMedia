@@ -19,4 +19,8 @@ public class JwtUserDetailsService implements UserDetailsService {
         User user = userService.findByUsername(username);
         return new JwtUserDetails(user);
     }
+
+    public JwtToken getTokenAuthenticated(String username) {
+        return JwtUtils.createToken(username);
+    }
 }
