@@ -1,14 +1,20 @@
 package com.project.socialmedia.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
 @Table(name = "customer")
-@AllArgsConstructor @NoArgsConstructor @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class User {
 
     @Id
@@ -25,7 +31,8 @@ public class User {
     private String summary;
 
     @Column(name = "birthdate")
-    private LocalDateTime birthDate;
+    @NotNull
+    private LocalDate birthDate;
 
     @Column(name = "username", unique = true)
     private String username;
@@ -36,7 +43,15 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @OneToMany(mappedBy = "author")  // Corrigido
+    @Column(name = "created_at", updatable = false)
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "author")
     private Set<Post> posts;
 
     @ManyToMany
@@ -50,4 +65,14 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "following_id"))
     private Set<User> following;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }
