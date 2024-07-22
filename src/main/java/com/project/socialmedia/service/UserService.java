@@ -7,10 +7,10 @@ import com.project.socialmedia.entity.User;
 import com.project.socialmedia.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,43 +20,58 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapperService userMapperService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserResponseDTO register(UserRequestDTO userRequestDTO){
+    public UserResponseDTO register(UserRequestDTO userRequestDTO) {
         User user = userMapperService.toEntity(userRequestDTO);
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
         User createdUser = userRepository.save(user);
         return userMapperService.toResponseDTO(createdUser);
     }
 
-    public Optional<UserResponseDTO> findById(Long id){
+    public Optional<UserResponseDTO> findById(Long id) {
         return userRepository.findById(id).map(userMapperService::toResponseDTO);
     }
 
     public User findByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException(String.format("User not found"))
+                () -> new EntityNotFoundException("User not found")
         );
     }
 
-    public List<UserResponseDTO> findAll(){
+    public List<UserResponseDTO> findAll() {
         return userRepository.findAll().stream()
                 .map(userMapperService::toResponseDTO).toList();
     }
 
-    public UserResponseDTO update(Long id, UserRequestDTO userRequestDTO){
-        if (userRepository.existsById(id)){
-            User user = userMapperService.toEntity(userRequestDTO);
-            user.setId(id);
-            User updatedUser = userRepository.save(user);
-            return userMapperService.toResponseDTO(updatedUser);
+    @Transactional
+    public UserResponseDTO update(Long id, UserRequestDTO userRequestDTO) {
+        if (userRepository.existsById(id)) {
+            User existingUser = userRepository.findById(id).orElseThrow(
+                    () -> new EntityNotFoundException("User not found")
+            );
+            User updatedUser = userMapperService.toEntity(userRequestDTO);
+            updatedUser.setId(id);
+
+            if (userRequestDTO.getPassword() != null && !userRequestDTO.getPassword().isEmpty()) {
+                String encodedPassword = passwordEncoder.encode(userRequestDTO.getPassword());
+                updatedUser.setPassword(encodedPassword);
+            } else {
+                updatedUser.setPassword(existingUser.getPassword());
+            }
+
+            User savedUser = userRepository.save(updatedUser);
+            return userMapperService.toResponseDTO(savedUser);
         }
         return null;
     }
 
-    public void delete(Long id){
+    public void delete(Long id) {
         userRepository.deleteById(id);
     }
 
-    public void follow(Long userId, Long followId){
+    public void follow(Long userId, Long followId) {
         User user = userRepository.findById(userId).orElseThrow();
         User follow = userRepository.findById(followId).orElseThrow();
         user.getFollowing().add(follow);

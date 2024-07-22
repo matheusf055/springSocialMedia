@@ -1,5 +1,6 @@
 package com.project.socialmedia.config;
 
+import com.project.socialmedia.jwt.JwtAuthorizationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -28,7 +30,15 @@ public class SecurityConfig {
                                 .anyRequest().permitAll()
                 ).sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ).build();
+                ).addFilterBefore(
+                        new JwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class
+                )
+                .build();
+    }
+
+    @Bean
+    public JwtAuthorizationFilter jwtAuthorizationFilter(){
+        return new JwtAuthorizationFilter();
     }
 
     @Bean
