@@ -52,7 +52,7 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "authorDetails")
+    @OneToMany(mappedBy = "authorDetails", fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<Post> posts = new HashSet<>();
 

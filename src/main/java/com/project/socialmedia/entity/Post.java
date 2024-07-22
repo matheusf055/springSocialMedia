@@ -44,7 +44,7 @@ public class Post {
     private LocalDateTime updatedAt;
 
     @ManyToOne
-    @JoinColumn(name = "author_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     @JsonIgnore
     private User authorDetails;
 

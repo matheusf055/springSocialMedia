@@ -1,25 +1,33 @@
 package com.project.socialmedia.service;
 
+import com.project.socialmedia.dto.PostDTO;
+import com.project.socialmedia.dto.ProfileDTO;
 import com.project.socialmedia.dto.UserRequestDTO;
 import com.project.socialmedia.dto.UserResponseDTO;
+import com.project.socialmedia.dto.mapper.ProfileMapperService;
 import com.project.socialmedia.dto.mapper.UserMapperService;
 import com.project.socialmedia.entity.User;
 import com.project.socialmedia.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final UserMapperService userMapperService;
+    private final ProfileMapperService profileMapperService;
     private final PasswordEncoder passwordEncoder;
 
     public UserResponseDTO register(UserRequestDTO userRequestDTO) {
@@ -32,6 +40,17 @@ public class UserService {
 
     public Optional<UserResponseDTO> findById(Long id) {
         return userRepository.findById(id).map(userMapperService::toResponseDTO);
+    }
+
+    @Transactional
+    public Optional<ProfileDTO> getProfileById(Long userId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            List<PostDTO> postDTOs = profileMapperService.getPostsForUser(user.getPosts());
+            return Optional.of(profileMapperService.toProfileDTO(user, postDTOs));
+        }
+        return Optional.empty();
     }
 
     public User findByUsername(String username) {

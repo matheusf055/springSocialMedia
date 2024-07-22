@@ -1,5 +1,6 @@
 package com.project.socialmedia.controller;
 
+import com.project.socialmedia.dto.ProfileDTO;
 import com.project.socialmedia.dto.UserRequestDTO;
 import com.project.socialmedia.dto.UserResponseDTO;
 import com.project.socialmedia.service.UserService;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
@@ -37,6 +39,13 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id){
         return userService.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<ProfileDTO> getProfileById(@PathVariable Long userId) {
+        Optional<ProfileDTO> profile = userService.getProfileById(userId);
+        return profile.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping
