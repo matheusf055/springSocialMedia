@@ -5,6 +5,7 @@ import com.project.socialmedia.jwt.JwtUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -35,10 +36,15 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth", "/users/register", "/post/{id}", "/home").permitAll()
-                        .requestMatchers("/post","/users","/post/{postId}", "/post/{postId}/repost", "/post/{postId}/comment").authenticated()
-                        .requestMatchers("/profile", "/follow/{userId}", "/unfollow/{userId}", "/users/{userId}").authenticated()
-                        .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.POST, "user/{userId}/follow/{followId}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "user/{userId}/unfollow/{unfollowId}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/post").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/post").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/post/{postId}/repost").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/post/{postId}/comment").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/post/{postId}/like").authenticated()
+
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtAuthorizationFilter(jwtUserDetailsService), UsernamePasswordAuthenticationFilter.class)
