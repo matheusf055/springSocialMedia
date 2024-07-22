@@ -1,8 +1,10 @@
 package com.project.socialmedia.config;
 
 import com.project.socialmedia.jwt.JwtAuthorizationFilter;
+import com.project.socialmedia.jwt.JwtUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -20,6 +22,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private final JwtUserDetailsService jwtUserDetailsService;
+
+    public SecurityConfig(@Lazy JwtUserDetailsService jwtUserDetailsService) {
+        this.jwtUserDetailsService = jwtUserDetailsService;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -27,18 +35,14 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                                .anyRequest().permitAll()
-                ).sessionManagement(
-                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ).addFilterBefore(
-                        new JwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class
+                        .requestMatchers("/auth", "/users/register", "/post/{id}", "/home").permitAll()
+                        .requestMatchers("/post","/users","/post/{postId}", "/post/{postId}/repost", "/post/{postId}/comment").authenticated()
+                        .requestMatchers("/profile", "/follow/{userId}", "/unfollow/{userId}", "/users/{userId}").authenticated()
+                        .anyRequest().authenticated()
                 )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new JwtAuthorizationFilter(jwtUserDetailsService), UsernamePasswordAuthenticationFilter.class)
                 .build();
-    }
-
-    @Bean
-    public JwtAuthorizationFilter jwtAuthorizationFilter(){
-        return new JwtAuthorizationFilter();
     }
 
     @Bean

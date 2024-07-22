@@ -6,8 +6,12 @@ import com.project.socialmedia.dto.RetweetRequestDTO;
 import com.project.socialmedia.dto.mapper.PostMapperService;
 import com.project.socialmedia.entity.Comment;
 import com.project.socialmedia.entity.Post;
+import com.project.socialmedia.entity.User;
 import com.project.socialmedia.repository.PostRepository;
+import com.project.socialmedia.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,10 +23,18 @@ import java.util.Optional;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository; // Adicione isso para buscar o usuário autenticado
     private final PostMapperService postMapperService;
+
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+    }
 
     public PostResponseDTO create(PostRequestDTO postRequestDTO){
         Post post = postMapperService.toEntity(postRequestDTO);
+        post.setUserId(getAuthenticatedUser().getId());
         Post createdPost = postRepository.save(post);
         return postMapperService.toResponseDTO(createdPost);
     }
@@ -51,9 +63,11 @@ public class PostService {
 
     public void comment(Long postId, PostRequestDTO postRequestDTO) {
         Post post = postRepository.findById(postId).orElseThrow();
+        User user = getAuthenticatedUser();
         Comment comment = new Comment();
         comment.setText(postRequestDTO.getText());
         comment.setPost(post);
+        comment.setAuthor(user);
         post.getComments().add(comment);
         post.setNumberComments(post.getNumberComments() + 1);
         postRepository.save(post);
@@ -69,8 +83,9 @@ public class PostService {
         Post post = postRepository.findById(retweetRequestDTO.getPostId())
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
+        User user = getAuthenticatedUser();
         Post repost = new Post();
-        repost.setUserId(retweetRequestDTO.getAuthorId());
+        repost.setUserId(user.getId());
         repost.setText(post.getText());
         repost.setReposts(0);
         repost.setLikes(0);
