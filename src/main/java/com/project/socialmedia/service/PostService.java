@@ -23,7 +23,7 @@ import java.util.Optional;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository; // Adicione isso para buscar o usuário autenticado
+    private final UserRepository userRepository;
     private final PostMapperService postMapperService;
 
     private User getAuthenticatedUser() {

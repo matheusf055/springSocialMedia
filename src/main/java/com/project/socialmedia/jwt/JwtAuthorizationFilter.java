@@ -17,9 +17,11 @@ import java.io.IOException;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtUserDetailsService detailsService;
+    private final InvalidTokenService invalidTokenService;
 
-    public JwtAuthorizationFilter(JwtUserDetailsService detailsService) {
+    public JwtAuthorizationFilter(JwtUserDetailsService detailsService, InvalidTokenService invalidTokenService) {
         this.detailsService = detailsService;
+        this.invalidTokenService = invalidTokenService;
     }
 
     @Override
@@ -33,13 +35,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (!JwtUtils.isTokenValid(token)) {
-            log.warn("Bearer invalid or expired");
+        String jwtToken = token.substring(7);
+
+        if (!JwtUtils.isTokenValid(jwtToken) || invalidTokenService.isTokenInvalid(jwtToken)) {
+            log.warn("Bearer invalid, expired, or blacklisted");
             filterChain.doFilter(request, response);
             return;
         }
 
-        String username = JwtUtils.getUsernameFromToken(token);
+        String username = JwtUtils.getUsernameFromToken(jwtToken);
 
         toAuthentication(request, username);
 

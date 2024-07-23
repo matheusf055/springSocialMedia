@@ -1,5 +1,6 @@
 package com.project.socialmedia.config;
 
+import com.project.socialmedia.jwt.InvalidTokenService;
 import com.project.socialmedia.jwt.JwtAuthorizationFilter;
 import com.project.socialmedia.jwt.JwtUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -24,9 +25,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtUserDetailsService jwtUserDetailsService;
+    private final InvalidTokenService invalidTokenService;
 
-    public SecurityConfig(@Lazy JwtUserDetailsService jwtUserDetailsService) {
+    public SecurityConfig(@Lazy JwtUserDetailsService jwtUserDetailsService, InvalidTokenService invalidTokenService) {
         this.jwtUserDetailsService = jwtUserDetailsService;
+        this.invalidTokenService = invalidTokenService;
     }
 
     @Bean
@@ -43,11 +46,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/post/{postId}/repost").authenticated()
                         .requestMatchers(HttpMethod.POST, "/post/{postId}/comment").authenticated()
                         .requestMatchers(HttpMethod.POST, "/post/{postId}/like").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
 
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JwtAuthorizationFilter(jwtUserDetailsService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthorizationFilter(jwtUserDetailsService, invalidTokenService), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
