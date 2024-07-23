@@ -4,6 +4,7 @@ import com.project.socialmedia.dto.ProfileDTO;
 import com.project.socialmedia.dto.UserRequestDTO;
 import com.project.socialmedia.dto.UserResponseDTO;
 import com.project.socialmedia.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
+@Tag(name = "Users", description = "Endpoints for Users")
 public class UserController {
 
     private final UserService userService;
