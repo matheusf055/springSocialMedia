@@ -4,6 +4,10 @@ import com.project.socialmedia.dto.UserLoginDTO;
 import com.project.socialmedia.jwt.InvalidTokenService;
 import com.project.socialmedia.jwt.JwtToken;
 import com.project.socialmedia.jwt.JwtUserDetailsService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor @Slf4j
+@Tag(name = "Authentication", description = "Endpoints for authentication")
 public class AuthenticationController {
 
     private final JwtUserDetailsService detailsService;
@@ -29,7 +34,13 @@ public class AuthenticationController {
     private final InvalidTokenService invalidTokenService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authentic(@RequestBody @Valid UserLoginDTO userLoginDTO, HttpServletRequest request){
+    @Operation(summary = "Authenticate user", description = "Authenticate user", tags = {"Users"}, responses = {
+            @ApiResponse(description = "Authenticated", responseCode = "200", content = @Content),
+            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+            @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
+    })
+    public ResponseEntity<?> authentic(@RequestBody @Valid UserLoginDTO userLoginDTO){
         log.info("Authentication process");
         try {
             UsernamePasswordAuthenticationToken authenticationToken =
@@ -47,6 +58,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "Logout user", description = "Logout user", tags = {"Users"}, responses = {
+            @ApiResponse(description = "Logout", responseCode = "200", content = @Content),
+            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+            @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
+    })
     public ResponseEntity<?> logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
