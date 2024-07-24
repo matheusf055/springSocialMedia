@@ -48,6 +48,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/post/{postId}/like").authenticated()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
 
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-resources/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/webjars/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
