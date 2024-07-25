@@ -80,6 +80,19 @@ public class User {
         updatedAt = LocalDateTime.now();
     }
 
+    public User(Long id, String firstName, String lastName, String summary, LocalDate birthDate, String username, String email, String password, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.summary = summary;
+        this.birthDate = birthDate;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(id);
