@@ -1,6 +1,7 @@
 package com.project.socialmedia.domain;
 
-import static com.project.socialmedia.common.TestsConstans.*;
+import static com.project.socialmedia.common.PostConstants.USER;
+import static com.project.socialmedia.common.UserConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;

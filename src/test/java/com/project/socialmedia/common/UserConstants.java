@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class TestsConstans {
+public class UserConstants {
 
     public static final User USER = new User(
             1L,
